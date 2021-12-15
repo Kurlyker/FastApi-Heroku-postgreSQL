@@ -69,6 +69,10 @@ async def startup():
 async def shutdown():
     await database.disconnect()
 
+@app.get("/")
+async def read_notes():
+    return print("Дарова!")
+
 
 @app.get("/notes/", response_model=List[Note])
 async def read_notes():

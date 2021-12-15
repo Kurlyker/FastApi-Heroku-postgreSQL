@@ -104,7 +104,7 @@ async def create_note(note: NoteIn):
     return {**note.dict(), "id": last_record_id}
 
 
-@app.get("/users/", response_model=List[UserList])
-async def read_notes():
-    query = notes.select()
+@app.get("/users", response_model=List[UserList], tags=["Users"])
+async def find_all_users():
+    query = users.select()
     return await database.fetch_all(query)

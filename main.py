@@ -1,11 +1,14 @@
+import datetime, uuid
+
 from typing import List
 
 import databases
 
 import sqlalchemy
 
-from models.users_model import UserList
+from models.users_model import UserList, UserEntry, UserUpdate, UserDelete
 
+from passlib.context import CryptContext
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -64,6 +67,8 @@ class Note(BaseModel):
     completed: bool
 
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 app = FastAPI(
     docs_url="/docs",
     redoc_url="/redocs",
@@ -108,3 +113,65 @@ async def create_note(note: NoteIn):
 async def find_all_users():
     query = users.select()
     return await database.fetch_all(query)
+
+
+
+@app.post("/users", response_model=UserList, tags=["Users"])
+async def register_user(user: UserEntry):
+    gID   = str(uuid.uuid1())
+    gDate =str(datetime.datetime.now())
+    query = users.insert().values(
+        id = gID,
+        username   = user.username,
+        password   = pwd_context.hash(user.password),
+        first_name = user.first_name,
+        last_name  = user.last_name,
+        gender     = user.gender,
+        create_at  = gDate,
+        status     = "1"
+    ) 
+    await database.execute(query)
+    return {
+        "id": gID,
+        **user.dict(),
+        "create_at":gDate,
+        "status": "1"
+    }
+
+
+
+
+@app.get("/users/{userId}", response_model=UserList, tags=["Users"])
+async def find_user_by_id(userId: str):
+    query = users.select().where(users.c.id == userId)
+    return await database.fetch_one(query)
+
+
+
+@app.put("/users", response_model=UserList, tags=["Users"])
+async def update_user(user: UserUpdate):
+    gDate = str(datetime.datetime.now())
+    query = users.update().\
+        where(users.c.id == user.id).\
+        values(
+            first_name = user.first_name,
+            last_name  = user.last_name,
+            gender     = user.gender,
+            status     = user.status,
+            create_at  = gDate,
+        )
+    await database.execute(query)
+
+    return await find_user_by_id(user.id)
+
+
+
+@app.delete("/users/{userId}", tags=["Users"])
+async def delete_user(user: UserDelete):
+    query = users.delete().where(users.c.id == user.id)
+    await database.execute(query)
+
+    return {
+        "status" : True,
+        "message": "This user has been deleted successfully." 
+    }

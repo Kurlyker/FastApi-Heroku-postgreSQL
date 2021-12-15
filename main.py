@@ -4,6 +4,8 @@ import databases
 
 import sqlalchemy
 
+from models.users_model import UserList
+
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -31,6 +33,18 @@ notes = sqlalchemy.Table(
 
 )
 
+users = sqlalchemy.Table(
+    "py_users",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.String, primary_key=True),
+    sqlalchemy.Column("username", sqlalchemy.String),
+    sqlalchemy.Column("password", sqlalchemy.String),
+    sqlalchemy.Column("first_name", sqlalchemy.String),
+    sqlalchemy.Column("last_name", sqlalchemy.String),
+    sqlalchemy.Column("gender", sqlalchemy.CHAR  ),
+    sqlalchemy.Column("create_at", sqlalchemy.String),
+    sqlalchemy.Column("status", sqlalchemy.CHAR  ),
+)
 
 
 engine = sqlalchemy.create_engine(
@@ -90,3 +104,7 @@ async def create_note(note: NoteIn):
     return {**note.dict(), "id": last_record_id}
 
 
+@app.get("/users/", response_model=List[UserList])
+async def read_notes():
+    query = notes.select()
+    return await database.fetch_all(query)

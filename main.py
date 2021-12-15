@@ -8,7 +8,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 
-DATABASE_URL = "postgres://pujqcrbbdgsgim:1340fceb0baaab2b2682f54f48a5c1bb5fa48099f7616138f51e588671b3e50b@ec2-52-45-183-77.compute-1.amazonaws.com:5432/da79q554o4g8gh"
+DATABASE_URL = "postgresql://kxcmhbkhvyyfel:bcea7a52633f6d2b8278c4880343774c2166835491d099bc28e3300e7d1ca5ba@ec2-52-213-119-221.eu-west-1.compute.amazonaws.com:5432/d7c6o4a367jfbo"
 
 database = databases.Database(DATABASE_URL)
 
@@ -50,7 +50,14 @@ class Note(BaseModel):
     completed: bool
 
 
-app = FastAPI()
+app = FastAPI(
+    docs_url="/docs",
+    redoc_url="/redocs",
+    title="професиANAL PROGRAMMING",
+    description="Кто прочитал тот сдохнет",
+    version="2.0",
+    openapi_url="/api/v2/openapi.json",  
+)
 
 
 @app.on_event("startup")

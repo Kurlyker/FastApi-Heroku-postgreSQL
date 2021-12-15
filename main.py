@@ -139,8 +139,6 @@ async def register_user(user: UserEntry):
     }
 
 
-
-
 @app.get("/users/{userId}", response_model=UserList, tags=["Users"])
 async def find_user_by_id(userId: str):
     query = users.select().where(users.c.id == userId)

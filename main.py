@@ -8,6 +8,7 @@ import sqlalchemy
 
 from models.users_model import UserList, UserEntry, UserUpdate, UserDelete
 from models.group_model import GroupList, GroupEntry, GroupUpdate, GroupDelete
+from models.posts_model import PostList, PostEntry, PostUpdate, PostDelete
 
 from passlib.context import CryptContext
 from fastapi import FastAPI
@@ -43,6 +44,15 @@ groups = sqlalchemy.Table(
     sqlalchemy.Column("id", sqlalchemy.String, primary_key=True),
     sqlalchemy.Column("name", sqlalchemy.String),
     sqlalchemy.Column("description", sqlalchemy.String),
+)
+
+posts = sqlalchemy.Table(
+    "post",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.String, primary_key=True),
+    sqlalchemy.Column("title", sqlalchemy.String),
+    sqlalchemy.Column("description", sqlalchemy.String),
+    sqlalchemy.Column("create_at", sqlalchemy.String),
 )
 
 
@@ -186,7 +196,7 @@ async def update_group(group: GroupUpdate):
         where(groups.c.id == group.id).\
         values(
             name = group.name,
-            description  = group.description
+            description  = group.description,
         )
     await database.execute(query)
 
@@ -202,4 +212,65 @@ async def delete_group(group: GroupDelete):
     return {
         "status" : True,
         "message": "This group has been deleted successfully." 
+    }
+
+
+
+
+#POST
+@app.get("/post", response_model=List[PostList], tags=["Posts"])
+async def find_all_posts():
+    query = posts.select()
+    return await database.fetch_all(query)
+
+
+
+@app.post("/post", response_model=PostList, tags=["Posts"])
+async def register_post(post: PostEntry):
+    gID   = str(uuid.uuid1())
+    gDate =str(datetime.datetime.now())
+    query = posts.insert().values(
+        id = gID,
+        title   = post.title,
+        description   = post.description,
+        create_at  = gDate,
+    ) 
+    await database.execute(query)
+    return {
+        "id": gID,
+        **post.dict()
+    }
+
+
+@app.get("/post/{postId}", response_model=PostList, tags=["Posts"])
+async def find_post_by_id(postId: str):
+    query = posts.select().where(posts.c.id == postId)
+    return await database.fetch_one(query)
+
+
+
+@app.put("/posts", response_model=PostList, tags=["Posts"])
+async def update_post(post: PostUpdate):
+    gDate = str(datetime.datetime.now())
+    query = posts.update().\
+        where(posts.c.id == post.id).\
+        values(
+            title = post.title,
+            description  = post.description,
+            create_at  = gDate,
+        )
+    await database.execute(query)
+
+    return await find_post_by_id(post.id)
+
+
+
+@app.delete("/posts/{postId}", tags=["Posts"])
+async def delete_post(post: PostDelete):
+    query = post.delete().where(posts.c.id == post.id)
+    await database.execute(query)
+
+    return {
+        "status" : True,
+        "message": "This post has been deleted successfully." 
     }

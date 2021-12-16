@@ -200,7 +200,7 @@ async def register_group(group: GroupEntry):
     query = groups.insert().values(
         id = gID,
         name   = group.name,
-        description   = group.first_name
+        description   = group.first_name,
     ) 
     await database.execute(query)
     return {

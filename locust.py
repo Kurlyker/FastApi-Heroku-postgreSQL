@@ -10,7 +10,7 @@ class UserBehavior(TaskSet):
         self.token = ""
         self.headers = {}
    
-     @task(1)
+    @task(1)
     def lol_index(self):
         self.client.get("/")
    

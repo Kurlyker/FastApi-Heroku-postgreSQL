@@ -23,15 +23,6 @@ metadata = sqlalchemy.MetaData()
 
 
 
-notes = sqlalchemy.Table(
-
-    "notes",
-    metadata,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("text", sqlalchemy.String),
-    sqlalchemy.Column("completed", sqlalchemy.Boolean),
-
-)
 
 users = sqlalchemy.Table(
     "py_users",
@@ -61,25 +52,14 @@ engine = sqlalchemy.create_engine(
 metadata.create_all(engine)
 
 
-class NoteIn(BaseModel):
-    text: str
-    completed: bool
-
-
-class Note(BaseModel):
-    id: int
-    text: str
-    completed: bool
-
-
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 app = FastAPI(
     docs_url="/docs",
     redoc_url="/redocs",
-    title="професиANAL PROGRAMMING",
-    description="Кто прочитал тот сдохнет",
-    version="2.0",
+    title="Fart-API postgreSQL",
+    description="Привіт",
+    version="1.4.8.8",
     openapi_url="/api/v2/openapi.json",  
 )
 

@@ -7,6 +7,7 @@ import databases
 import sqlalchemy
 
 from models.users_model import UserList, UserEntry, UserUpdate, UserDelete
+from models.group_model import GroupList, GroupEntry, GroupUpdate, GroupDelete
 
 from passlib.context import CryptContext
 from fastapi import FastAPI
@@ -25,13 +26,9 @@ metadata = sqlalchemy.MetaData()
 notes = sqlalchemy.Table(
 
     "notes",
-
     metadata,
-
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-
     sqlalchemy.Column("text", sqlalchemy.String),
-
     sqlalchemy.Column("completed", sqlalchemy.Boolean),
 
 )
@@ -47,6 +44,14 @@ users = sqlalchemy.Table(
     sqlalchemy.Column("gender", sqlalchemy.CHAR  ),
     sqlalchemy.Column("create_at", sqlalchemy.String),
     sqlalchemy.Column("status", sqlalchemy.CHAR  ),
+)
+
+groups = sqlalchemy.Table(
+    "group",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.String, primary_key=True),
+    sqlalchemy.Column("name", sqlalchemy.String),
+    sqlalchemy.Column("description", sqlalchemy.String),
 )
 
 
@@ -109,6 +114,9 @@ async def create_note(note: NoteIn):
     return {**note.dict(), "id": last_record_id}
 
 
+
+
+#USERS
 @app.get("/users", response_model=List[UserList], tags=["Users"])
 async def find_all_users():
     query = users.select()
@@ -172,4 +180,63 @@ async def delete_user(user: UserDelete):
     return {
         "status" : True,
         "message": "This user has been deleted successfully." 
+    }
+
+
+
+
+
+#GROUP
+@app.get("/group", response_model=List[GroupList], tags=["Group"])
+async def find_all_groups():
+    query = groups.select()
+    return await database.fetch_all(query)
+
+
+
+@app.post("/group", response_model=GroupList, tags=["Group"])
+async def register_group(group: GroupEntry):
+    gID   = str(uuid.uuid1())
+    query = groups.insert().values(
+        id = gID,
+        name   = group.name,
+        description   = group.first_name
+    ) 
+    await database.execute(query)
+    return {
+        "id": gID,
+        **group.dict()
+    }
+
+
+@app.get("/group/{groupId}", response_model=GroupList, tags=["Group"])
+async def find_group_by_id(groupId: str):
+    query = groups.select().where(group.c.id == groupId)
+    return await database.fetch_one(query)
+
+
+
+@app.put("/groups", response_model=GroupList, tags=["Groups"])
+async def update_group(group: GroupUpdate):
+    gDate = str(datetime.datetime.now())
+    query = groups.update().\
+        where(groups.c.id == group.id).\
+        values(
+            name = group.name,
+            description  = group.description
+        )
+    await database.execute(query)
+
+    return await find_group_by_id(group.id)
+
+
+
+@app.delete("/groups/{groupId}", tags=["Groups"])
+async def delete_group(group: GroupDelete):
+    query = groups.delete().where(groups.c.id == group.id)
+    await database.execute(query)
+
+    return {
+        "status" : True,
+        "message": "This group has been deleted successfully." 
     }

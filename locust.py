@@ -1,4 +1,4 @@
-from locust import HttpLocust, TaskSet, task
+from locust import HttpUser, TaskSet, task
 
 class UserBehavior(TaskSet):
 
@@ -12,7 +12,7 @@ class UserBehavior(TaskSet):
 
   
 
-class WebsiteUser(HttpLocust):
+class WebsiteUser(HttpUser):
     task_set = UserBehavior
     min_wait = 1000
     max_wait = 2000

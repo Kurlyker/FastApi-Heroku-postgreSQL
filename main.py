@@ -187,14 +187,14 @@ async def delete_user(user: UserDelete):
 
 
 #GROUP
-@app.get("/group", response_model=List[GroupList], tags=["Group"])
+@app.get("/group", response_model=List[GroupList], tags=["Groups"])
 async def find_all_groups():
     query = groups.select()
     return await database.fetch_all(query)
 
 
 
-@app.post("/group", response_model=GroupList, tags=["Group"])
+@app.post("/group", response_model=GroupList, tags=["Groups"])
 async def register_group(group: GroupEntry):
     gID   = str(uuid.uuid1())
     query = groups.insert().values(
@@ -209,7 +209,7 @@ async def register_group(group: GroupEntry):
     }
 
 
-@app.get("/group/{groupId}", response_model=GroupList, tags=["Group"])
+@app.get("/group/{groupId}", response_model=GroupList, tags=["Groups"])
 async def find_group_by_id(groupId: str):
     query = groups.select().where(group.c.id == groupId)
     return await database.fetch_one(query)

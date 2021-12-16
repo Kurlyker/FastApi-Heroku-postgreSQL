@@ -204,7 +204,7 @@ async def update_group(group: GroupUpdate):
 
 
 
-@app.delete("/groups/{groupId}", tags=["Groups"])
+@app.delete("/group/{groupId}", tags=["Groups"])
 async def delete_group(group: GroupDelete):
     query = groups.delete().where(groups.c.id == group.id)
     await database.execute(query)
@@ -265,7 +265,7 @@ async def update_post(post: PostUpdate):
 
 
 
-@app.delete("/posts/{postId}", tags=["Posts"])
+@app.delete("/post/{postId}", tags=["Posts"])
 async def delete_post(post: PostDelete):
     query = post.delete().where(posts.c.id == post.id)
     await database.execute(query)

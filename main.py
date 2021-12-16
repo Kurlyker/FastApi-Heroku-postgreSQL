@@ -211,7 +211,7 @@ async def register_group(group: GroupEntry):
 
 @app.get("/group/{groupId}", response_model=GroupList, tags=["Groups"])
 async def find_group_by_id(groupId: str):
-    query = groups.select().where(group.c.id == groupId)
+    query = groups.select().where(groups.c.id == groupId)
     return await database.fetch_one(query)
 
 

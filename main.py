@@ -17,16 +17,8 @@ from pydantic import BaseModel
 
 DATABASE_URL = "postgresql://kxcmhbkhvyyfel:bcea7a52633f6d2b8278c4880343774c2166835491d099bc28e3300e7d1ca5ba@ec2-52-213-119-221.eu-west-1.compute.amazonaws.com:5432/d7c6o4a367jfbo"
 
-#database = databases.Database(DATABASE_URL)
+database = databases.Database(DATABASE_URL)
 
-
-@app.on_event("startup")
-async def startup():
-    database = databases.Database(DATABASE_URL)
-
-@app.on_event("shutdown")
-async def shutdown():
-    await database.disconnect()
 
 
 metadata = sqlalchemy.MetaData()

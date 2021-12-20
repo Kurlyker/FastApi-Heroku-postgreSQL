@@ -98,6 +98,31 @@ async def find_all_users():
 
 
 
+@app.post("/usersreg", response_model=UserList, tags=["Users"])
+async def reg_user(user: UserEntry):
+    gID   = str(uuid.uuid1())
+    gDate =str(datetime.datetime.now())
+    query = users.insert().values(
+        id = gID,
+        username   = user.username,
+        password   = pwd_context.hash(user.password),
+        first_name = user.first_name,
+        last_name  = user.last_name,
+        gender     = user.gender,
+        create_at  = gDate,
+        status     = "1"
+    ) 
+    await database.execute(query)
+    return {
+        "id": gID,
+        **user.dict(),
+        "create_at":gDate,
+        "status": "1"
+    }
+
+
+
+
 @app.post("/users", response_model=UserList, tags=["Users"])
 async def register_user(user: UserEntry):
     gID   = str(uuid.uuid1())

@@ -1,7 +1,17 @@
-from locust import HttpUser, task
+from locust import task, FastHttpUser
 
-class HelloWorldUser(HttpUser):
+class MyUser(FastHttpUser):
     @task
-    def hello_world(self):
-        self.client.get("/")
-        self.client.get("/users")
+    def index(self):
+        response = self.client.get("/group")
+
+    @task
+    def post(self):
+        response = self.client.get("/post")
+
+    @task
+    def indexlink(self):
+        response = self.client.get("/")
+        #response = self.client.post("/group", json={"name": "NameGroup", "description": "description bla bla bla"})
+        #       response = self.client.post("/group", json={"name": "NameGroup", "description": "description bla bla bla"})
+        #       response = self.client.post("/users", json={"username": "locust", "password": "locust", "first_name": "locust", "last_name": "locust", "gender": "M",})
